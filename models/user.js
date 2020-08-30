@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validatorUrl = require('validator').isURL;
+const validatorEmail = require('validator').isEmail;
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -22,6 +23,20 @@ const userSchema = new mongoose.Schema({
       message: 'передана некорректная ссылка',
     },
   },
+  email: {
+    type: String,
+    required: [true, 'это поле является обязательным для заполения'],
+    validate: {
+      validator: (v) => validatorEmail(v),
+      message: 'указан неверный адрес почтового ящика',
+    },
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: [true, 'это поле является обязательным для заполения'],
+  },
+  minlength: 8,
 });
 
 module.exports = mongoose.model('user', userSchema);
