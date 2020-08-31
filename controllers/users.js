@@ -55,7 +55,6 @@ module.exports.login = (req, res) => {
       });
     })
     .catch((err) => {
-      res
-        .status(401).send({ message: err.message });
+      res.status(401).send({ message: err.message });
     });
 };
