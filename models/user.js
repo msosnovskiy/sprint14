@@ -30,13 +30,12 @@ const userSchema = new mongoose.Schema({
       validator: (v) => validatorEmail(v),
       message: 'указан неверный адрес почтового ящика',
     },
-    unique: true,
+    unique: [true, 'такой e-mail уже существует'],
   },
   password: {
     type: String,
     required: [true, 'это поле является обязательным для заполения'],
   },
-  minlength: 8,
 });
 
 module.exports = mongoose.model('user', userSchema);
