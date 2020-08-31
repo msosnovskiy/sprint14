@@ -1,8 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const login = require('./routes/login');
-const createUser = require('./routes/createUser');
+const { login, createUser } = require('./controllers/users');
 const users = require('./routes/users');
 const cards = require('./routes/cards');
 
@@ -20,7 +19,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '5f3f85cc52d5d1582ce12de1',
+    _id: '5f4cacdff5c29e1adc55d418',
   };
 
   next();
@@ -35,5 +34,6 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`App listening on port ${PORT}`);
 });
