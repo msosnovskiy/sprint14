@@ -18,19 +18,10 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
 });
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '5f4cacdff5c29e1adc55d418',
-  };
-
-  next();
-});
-
 app.post('/signin', login);
 app.post('/signup', createUser);
-app.use(auth);
-app.use('/users', users);
-app.use('/cards', cards);
+app.use('/users', auth, users);
+app.use('/cards', auth, cards);
 app.use((req, res) => {
   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
 });
