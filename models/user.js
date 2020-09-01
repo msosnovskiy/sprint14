@@ -31,17 +31,18 @@ const userSchema = new mongoose.Schema({
       validator: (v) => validatorEmail(v),
       message: 'указан неверный адрес почтового ящика',
     },
-    unique: [true, 'такой e-mail уже существует'],
+    unique: true,
   },
   password: {
     type: String,
     required: [true, 'это поле является обязательным для заполения'],
   },
+  select: false,
 });
 
 // eslint-disable-next-line func-names
 userSchema.statics.findUserByCredentials = function (email, password) {
-  return this.findOne({ email })
+  return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
         return Promise.reject(new Error('Неправильные почта или пароль'));
