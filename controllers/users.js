@@ -13,14 +13,14 @@ module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (user === null) {
-        res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+        res.status(404).send({ message: `Не удалось найти пользователя с userId - ${req.params.userId}` });
         return;
       }
       res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: `Не удалось найти пользователя с userId - ${req.params.userId}` });
+        res.status(400).send({ message: `передан некорректный ID пользователя - ${req.params.userId}` });
       } else res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
 };
@@ -61,7 +61,7 @@ module.exports.login = (req, res) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       res.send({
-        token: jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' }),
+        token: jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret-key', { expiresIn: '7d' }),
       });
     })
     .catch((err) => {
