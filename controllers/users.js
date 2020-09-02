@@ -26,28 +26,32 @@ module.exports.getUser = (req, res) => {
 
 module.exports.createUser = (req, res) => {
   const {
-    name, about, avatar, email,
+    name, about, avatar, email, password,
   } = req.body;
-
-  bcrypt.hash(req.body.password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    }))
-    .then(() => res.send({
-      name, about, avatar, email,
-    }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
-      }
-      if (err.name === 'MongoError') {
-        res.status(401).send({ message: err.message });
-      } else res.status(500).send({ message: 'На сервере произошла ошибка' });
-    });
+  if (!password) {
+    res.status(400).send({ message: 'пероль является обязательным для заполения' });
+  } else {
+    bcrypt.hash(req.body.password, 10)
+      .then((hash) => User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      }))
+      .then(() => res.send({
+        name, about, avatar, email,
+      }))
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          res.status(400).send({ message: err.message });
+          return;
+        }
+        if (err.name === 'MongoError' || err.code === 11000) {
+          res.status(409).send({ message: 'Указанный email уже занят' });
+        } else res.status(500).send({ message: 'На сервере произошла ошибка' });
+      });
+  }
 };
 
 module.exports.login = (req, res) => {

@@ -19,6 +19,7 @@ module.exports.createCard = (req, res) => {
 
 module.exports.removeCard = (req, res) => {
   Card.findById(req.params.cardId)
+    .orFail()
     .then(async (card) => {
       const userId = req.user._id;
       const ownerId = card.owner._id.toString();
@@ -28,8 +29,12 @@ module.exports.removeCard = (req, res) => {
       } else res.status(403).send({ message: 'Нет прав на удаление' });
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'TypeError') {
-        res.status(400).send({ message: `Не удалось найти карточку с cardId - ${req.params.cardId}` });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: `передан некорректный ID карточки - ${req.params.cardId}` });
+        return;
+      }
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: `не удалось найти карточку с cardId - ${req.params.cardId}` });
       } else res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
 };

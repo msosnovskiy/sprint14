@@ -36,8 +36,8 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'это поле является обязательным для заполения'],
+    select: false,
   },
-  select: false,
 });
 
 // eslint-disable-next-line func-names
