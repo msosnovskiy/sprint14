@@ -18,17 +18,23 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.removeCard = (req, res) => {
-  Card.findByIdAndDelete(req.params.cardId)
-    .then((card) => {
-      if (card === null) {
-        res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
-        return;
-      }
-      res.send({ data: card });
+  Card.findById(req.params.cardId)
+    .orFail()
+    .then(async (card) => {
+      const userId = req.user._id;
+      const ownerId = card.owner._id.toString();
+      if (ownerId === userId) {
+        const element = await Card.findByIdAndDelete(req.params.cardId);
+        res.send({ data: element });
+      } else res.status(403).send({ message: 'Нет прав на удаление' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: `Не удалось удалить карточку с cardId - ${req.params.cardId}` });
+        res.status(400).send({ message: `передан некорректный ID карточки - ${req.params.cardId}` });
+        return;
+      }
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: `не удалось найти карточку с cardId - ${req.params.cardId}` });
       } else res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
 };
